@@ -11,7 +11,6 @@
 ![JavaScript](https://img.shields.io/badge/JavaScript-ES6+-yellow)
 ![TailwindCSS](https://img.shields.io/badge/TailwindCSS-CSS%20Framework-38B2AC)
 ![PokeAPI](https://img.shields.io/badge/API-PokeAPI-red)
-![License](https://img.shields.io/badge/License-MIT-green)
 
 A **feature-rich Pokémon Web App** built with **React**, **TailwindCSS**, and **PokeAPI**.  
 It allows users to explore Pokémon details, filter, sort, view evolutions, and experience an interactive and smooth UI with animations.
@@ -29,7 +28,5 @@ It allows users to explore Pokémon details, filter, sort, view evolutions, and 
 - 🎥 **Videos Section** – Show Pokémon battle videos from external APIs.
 - 🖌 **Beautiful UI** – Animated cards, hover effects, and clean design.
 
----
 
-## 🗂 Project Structure
 

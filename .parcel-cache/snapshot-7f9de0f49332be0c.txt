@@ -1,0 +1,17 @@
+16
+85C:\Users\lenovo\OneDrive\Desktop\Development\Pokemon\Pokemon_React_Project\.postcssrc133987315800989170 0
+87C:\Users\lenovo\OneDrive\Desktop\Development\Pokemon\Pokemon_React_Project\package.json133991143680708614 0
+92C:\Users\lenovo\OneDrive\Desktop\Development\Pokemon\Pokemon_React_Project\package-lock.json133991143681620203 0
+85C:\Users\lenovo\OneDrive\Desktop\Development\Pokemon\Pokemon_React_Project\Components133991032293654693 1
+82C:\Users\lenovo\OneDrive\Desktop\Development\Pokemon\Pokemon_React_Project\App.jsx133991031195104965 0
+84C:\Users\lenovo\OneDrive\Desktop\Development\Pokemon\Pokemon_React_Project\index.css133991019736307908 0
+85C:\Users\lenovo\OneDrive\Desktop\Development\Pokemon\Pokemon_React_Project\index.html133989605451969709 0
+84C:\Users\lenovo\OneDrive\Desktop\Development\Pokemon\Pokemon_React_Project\ReadMe.md133991165106276983 0
+99C:\Users\lenovo\OneDrive\Desktop\Development\Pokemon\Pokemon_React_Project\Components\evolution.jsx133990657804700984 0
+102C:\Users\lenovo\OneDrive\Desktop\Development\Pokemon\Pokemon_React_Project\Components\fetchpokemon.jsx133991032361226850 0
+97C:\Users\lenovo\OneDrive\Desktop\Development\Pokemon\Pokemon_React_Project\Components\filters.jsx133991032194384487 0
+94C:\Users\lenovo\OneDrive\Desktop\Development\Pokemon\Pokemon_React_Project\Components\home.jsx133991032425897317 0
+98C:\Users\lenovo\OneDrive\Desktop\Development\Pokemon\Pokemon_React_Project\Components\pokecard.jsx133991162692102838 0
+104C:\Users\lenovo\OneDrive\Desktop\Development\Pokemon\Pokemon_React_Project\Components\pokemondetails.jsx133991051617414220 0
+97C:\Users\lenovo\OneDrive\Desktop\Development\Pokemon\Pokemon_React_Project\Components\shimmer.jsx133991032503868725 0
+96C:\Users\lenovo\OneDrive\Desktop\Development\Pokemon\Pokemon_React_Project\Components\sorter.jsx133991032533245932 0
