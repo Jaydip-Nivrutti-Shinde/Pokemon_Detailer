@@ -1,10 +1,13 @@
+// src/pages/Home.jsx
 import { useEffect, useState } from "react";
-import { fetchPokemons } from "./fetchpokemon";
+import { fetchPokemons } from "../Components/fetchpokemon";
 import PokeCard from "../Components/pokecard";
 import Filters from "../Components/filters";
 import Sorter from "../Components/sorter";
 import ShimmerCard from "../Components/shimmer";
 import { motion } from "framer-motion";
+
+let cachedPokemons = null; // Local cache
 
 export default function Home() {
   const [pokemons, setPokemons] = useState([]);
@@ -18,7 +21,16 @@ export default function Home() {
     const loadData = async () => {
       try {
         setLoading(true);
+
+        if (cachedPokemons) {
+          setPokemons(cachedPokemons);
+          setFilteredPokemons(cachedPokemons);
+          setLoading(false);
+          return;
+        }
+
         const data = await fetchPokemons();
+        cachedPokemons = data;
         setPokemons(data);
         setFilteredPokemons(data);
       } catch (error) {
@@ -30,24 +42,54 @@ export default function Home() {
     loadData();
   }, []);
 
+  // Full API search handler
+  const handleFullSearch = async () => {
+    if (!searchTerm.trim()) return;
+    try {
+      setLoading(true);
+      const res = await fetch(
+        `https://pokeapi.co/api/v2/pokemon/${searchTerm.toLowerCase()}`
+      );
+      if (!res.ok) {
+        alert("Pokémon not found");
+        return;
+      }
+      const data = await res.json();
+      const singlePokemon = {
+        id: data.id,
+        name: data.name,
+        image:
+          data.sprites.other?.dream_world?.front_default ||
+          data.sprites.front_default,
+        type: data.types.map((t) => t.type.name).join(", "),
+        height: data.height,
+        weight: data.weight,
+        abilities: data.abilities.map((a) => a.ability.name),
+      };
+      setFilteredPokemons([singlePokemon]);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Filter, search, sort locally for cached list
   useEffect(() => {
     let results = [...pokemons];
 
-    // Filter by search term
-    if (searchTerm) {
+    if (searchTerm && filteredPokemons.length !== 1) {
       results = results.filter((poke) =>
         poke.name.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
-    // Filter by type
     if (selectedType) {
       results = results.filter((poke) =>
         poke.type.toLowerCase().includes(selectedType.toLowerCase())
       );
     }
 
-    // Sorting logic
     if (sortOption) {
       const [field, direction] = sortOption.split("-");
       results.sort((a, b) => {
@@ -91,8 +133,8 @@ export default function Home() {
         </motion.div>
 
         <div className="mb-6 flex flex-col md:flex-row gap-4 items-center justify-between">
-          <div className="w-full md:w-1/2">
-            <div className="relative">
+          <div className="w-full md:w-1/2 flex gap-2">
+            <div className="relative flex-1">
               <input
                 type="text"
                 placeholder="Search Pokémon by name..."
@@ -101,17 +143,34 @@ export default function Home() {
                 className="w-full px-4 py-2 border border-gray-300 rounded-full shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
               />
               <span className="absolute right-3 top-2 text-gray-400">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-6 w-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                  />
                 </svg>
               </span>
             </div>
+            <button
+              onClick={handleFullSearch}
+              className="px-4 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition"
+            >
+              API Search
+            </button>
           </div>
 
-          <Filters 
-            types={allTypes} 
-            selectedType={selectedType} 
-            onTypeChange={setSelectedType} 
+          <Filters
+            types={allTypes}
+            selectedType={selectedType}
+            onTypeChange={setSelectedType}
           />
         </div>
 
@@ -124,7 +183,7 @@ export default function Home() {
             ))}
           </div>
         ) : filteredPokemons.length > 0 ? (
-          <motion.div 
+          <motion.div
             layout
             className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6"
           >
@@ -140,12 +199,15 @@ export default function Home() {
           </motion.div>
         ) : (
           <div className="text-center py-12">
-            <div className="text-gray-500 text-lg mb-4">No Pokémon found matching your criteria</div>
+            <div className="text-gray-500 text-lg mb-4">
+              No Pokémon found matching your criteria
+            </div>
             <button
               onClick={() => {
                 setSearchTerm("");
                 setSelectedType("");
                 setSortOption("");
+                setFilteredPokemons(pokemons);
               }}
               className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
             >

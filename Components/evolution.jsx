@@ -1,7 +1,8 @@
-// src/components/EvolutionChain.jsx
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+
+const evoCache = {};
 
 export default function EvolutionChain({ pokemonId }) {
   const [evolutionChain, setEvolutionChain] = useState([]);
@@ -12,34 +13,43 @@ export default function EvolutionChain({ pokemonId }) {
     const fetchEvolutionChain = async () => {
       try {
         setLoading(true);
+
+        // ✅ Use cache if available
+        if (evoCache[pokemonId]) {
+          setEvolutionChain(evoCache[pokemonId]);
+          setLoading(false);
+          return;
+        }
+
         // First get the species data
         const speciesRes = await fetch(`https://pokeapi.co/api/v2/pokemon-species/${pokemonId}/`);
         const speciesData = await speciesRes.json();
-        
+
         // Then get the evolution chain
         const evoRes = await fetch(speciesData.evolution_chain.url);
         const evoData = await evoRes.json();
-        
+
         // Process the evolution chain
         const chain = [];
         let current = evoData.chain;
-        
+
         while (current) {
           const speciesId = current.species.url.split('/').slice(-2, -1)[0];
           const pokemonRes = await fetch(`https://pokeapi.co/api/v2/pokemon/${speciesId}`);
           const pokemonData = await pokemonRes.json();
-          
+
           chain.push({
             id: pokemonData.id,
             name: pokemonData.name,
-            image: pokemonData.sprites.other?.['official-artwork']?.front_default || 
-                  pokemonData.sprites.front_default,
+            image: pokemonData.sprites.other?.['official-artwork']?.front_default ||
+              pokemonData.sprites.front_default,
             types: pokemonData.types.map(t => t.type.name)
           });
-          
+
           current = current.evolves_to[0];
         }
-        
+
+        evoCache[pokemonId] = chain; // ✅ Save to cache
         setEvolutionChain(chain);
       } catch (error) {
         console.error("Error fetching evolution chain:", error);
@@ -47,7 +57,7 @@ export default function EvolutionChain({ pokemonId }) {
         setLoading(false);
       }
     };
-    
+
     fetchEvolutionChain();
   }, [pokemonId]);
 
@@ -91,8 +101,8 @@ export default function EvolutionChain({ pokemonId }) {
             <span className="mt-2 font-medium capitalize">{pokemon.name}</span>
             <div className="flex gap-1 mt-1">
               {pokemon.types.map(type => (
-                <span 
-                  key={type} 
+                <span
+                  key={type}
                   className={`px-2 py-0.5 text-xs rounded-full ${
                     type === 'fire' ? 'bg-red-500' :
                     type === 'water' ? 'bg-blue-500' :

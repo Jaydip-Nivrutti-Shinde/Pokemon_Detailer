@@ -23407,14 +23407,15 @@ var prevRefreshSig = globalThis.$RefreshSig$;
 $parcel$ReactRefreshHelpers$5e42.prelude(module);
 
 try {
+// src/pages/Home.jsx
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "default", ()=>Home);
 var _jsxDevRuntime = require("react/jsx-dev-runtime");
 var _react = require("react");
-var _fetchpokemon = require("./fetchpokemon");
-var _pokeCard = require("../components/PokeCard");
-var _pokeCardDefault = parcelHelpers.interopDefault(_pokeCard);
+var _fetchpokemon = require("../Components/fetchpokemon");
+var _pokecard = require("../Components/pokecard");
+var _pokecardDefault = parcelHelpers.interopDefault(_pokecard);
 var _filters = require("../Components/filters");
 var _filtersDefault = parcelHelpers.interopDefault(_filters);
 var _sorter = require("../Components/sorter");
@@ -23423,6 +23424,7 @@ var _shimmer = require("../Components/shimmer");
 var _shimmerDefault = parcelHelpers.interopDefault(_shimmer);
 var _framerMotion = require("framer-motion");
 var _s = $RefreshSig$();
+let cachedPokemons = null; // Local cache
 function Home() {
     _s();
     const [pokemons, setPokemons] = (0, _react.useState)([]);
@@ -23435,7 +23437,14 @@ function Home() {
         const loadData = async ()=>{
             try {
                 setLoading(true);
+                if (cachedPokemons) {
+                    setPokemons(cachedPokemons);
+                    setFilteredPokemons(cachedPokemons);
+                    setLoading(false);
+                    return;
+                }
                 const data = await (0, _fetchpokemon.fetchPokemons)();
+                cachedPokemons = data;
                 setPokemons(data);
                 setFilteredPokemons(data);
             } catch (error) {
@@ -23446,15 +23455,42 @@ function Home() {
         };
         loadData();
     }, []);
+    // Full API search handler
+    const handleFullSearch = async ()=>{
+        if (!searchTerm.trim()) return;
+        try {
+            setLoading(true);
+            const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${searchTerm.toLowerCase()}`);
+            if (!res.ok) {
+                alert("Pok\xe9mon not found");
+                return;
+            }
+            const data = await res.json();
+            const singlePokemon = {
+                id: data.id,
+                name: data.name,
+                image: data.sprites.other?.dream_world?.front_default || data.sprites.front_default,
+                type: data.types.map((t)=>t.type.name).join(", "),
+                height: data.height,
+                weight: data.weight,
+                abilities: data.abilities.map((a)=>a.ability.name)
+            };
+            setFilteredPokemons([
+                singlePokemon
+            ]);
+        } catch (err) {
+            console.error(err);
+        } finally{
+            setLoading(false);
+        }
+    };
+    // Filter, search, sort locally for cached list
     (0, _react.useEffect)(()=>{
         let results = [
             ...pokemons
         ];
-        // Filter by search term
-        if (searchTerm) results = results.filter((poke)=>poke.name.toLowerCase().includes(searchTerm.toLowerCase()));
-        // Filter by type
+        if (searchTerm && filteredPokemons.length !== 1) results = results.filter((poke)=>poke.name.toLowerCase().includes(searchTerm.toLowerCase()));
         if (selectedType) results = results.filter((poke)=>poke.type.toLowerCase().includes(selectedType.toLowerCase()));
-        // Sorting logic
         if (sortOption) {
             const [field, direction] = sortOption.split("-");
             results.sort((a, b)=>{
@@ -23500,7 +23536,7 @@ function Home() {
                             children: "Pok\xe9mon Explorer"
                         }, void 0, false, {
                             fileName: "Components/home.jsx",
-                            lineNumber: 87,
+                            lineNumber: 129,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("p", {
@@ -23508,71 +23544,82 @@ function Home() {
                             children: "Discover your favorite Pok\xe9mon!"
                         }, void 0, false, {
                             fileName: "Components/home.jsx",
-                            lineNumber: 90,
+                            lineNumber: 132,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "Components/home.jsx",
-                    lineNumber: 81,
+                    lineNumber: 123,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
                     className: "mb-6 flex flex-col md:flex-row gap-4 items-center justify-between",
                     children: [
                         /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
-                            className: "w-full md:w-1/2",
-                            children: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
-                                className: "relative",
-                                children: [
-                                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("input", {
-                                        type: "text",
-                                        placeholder: "Search Pok\xe9mon by name...",
-                                        value: searchTerm,
-                                        onChange: (e)=>setSearchTerm(e.target.value),
-                                        className: "w-full px-4 py-2 border border-gray-300 rounded-full shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                                    }, void 0, false, {
-                                        fileName: "Components/home.jsx",
-                                        lineNumber: 96,
-                                        columnNumber: 15
-                                    }, this),
-                                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("span", {
-                                        className: "absolute right-3 top-2 text-gray-400",
-                                        children: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("svg", {
-                                            xmlns: "http://www.w3.org/2000/svg",
-                                            className: "h-6 w-6",
-                                            fill: "none",
-                                            viewBox: "0 0 24 24",
-                                            stroke: "currentColor",
-                                            children: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("path", {
-                                                strokeLinecap: "round",
-                                                strokeLinejoin: "round",
-                                                strokeWidth: 2,
-                                                d: "M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                            className: "w-full md:w-1/2 flex gap-2",
+                            children: [
+                                /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
+                                    className: "relative flex-1",
+                                    children: [
+                                        /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("input", {
+                                            type: "text",
+                                            placeholder: "Search Pok\xe9mon by name...",
+                                            value: searchTerm,
+                                            onChange: (e)=>setSearchTerm(e.target.value),
+                                            className: "w-full px-4 py-2 border border-gray-300 rounded-full shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                        }, void 0, false, {
+                                            fileName: "Components/home.jsx",
+                                            lineNumber: 138,
+                                            columnNumber: 15
+                                        }, this),
+                                        /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("span", {
+                                            className: "absolute right-3 top-2 text-gray-400",
+                                            children: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("svg", {
+                                                xmlns: "http://www.w3.org/2000/svg",
+                                                className: "h-6 w-6",
+                                                fill: "none",
+                                                viewBox: "0 0 24 24",
+                                                stroke: "currentColor",
+                                                children: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("path", {
+                                                    strokeLinecap: "round",
+                                                    strokeLinejoin: "round",
+                                                    strokeWidth: 2,
+                                                    d: "M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                                                }, void 0, false, {
+                                                    fileName: "Components/home.jsx",
+                                                    lineNumber: 153,
+                                                    columnNumber: 19
+                                                }, this)
                                             }, void 0, false, {
                                                 fileName: "Components/home.jsx",
-                                                lineNumber: 105,
-                                                columnNumber: 19
+                                                lineNumber: 146,
+                                                columnNumber: 17
                                             }, this)
                                         }, void 0, false, {
                                             fileName: "Components/home.jsx",
-                                            lineNumber: 104,
-                                            columnNumber: 17
+                                            lineNumber: 145,
+                                            columnNumber: 15
                                         }, this)
-                                    }, void 0, false, {
-                                        fileName: "Components/home.jsx",
-                                        lineNumber: 103,
-                                        columnNumber: 15
-                                    }, this)
-                                ]
-                            }, void 0, true, {
-                                fileName: "Components/home.jsx",
-                                lineNumber: 95,
-                                columnNumber: 13
-                            }, this)
-                        }, void 0, false, {
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "Components/home.jsx",
+                                    lineNumber: 137,
+                                    columnNumber: 13
+                                }, this),
+                                /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("button", {
+                                    onClick: handleFullSearch,
+                                    className: "px-4 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition",
+                                    children: "API Search"
+                                }, void 0, false, {
+                                    fileName: "Components/home.jsx",
+                                    lineNumber: 162,
+                                    columnNumber: 13
+                                }, this)
+                            ]
+                        }, void 0, true, {
                             fileName: "Components/home.jsx",
-                            lineNumber: 94,
+                            lineNumber: 136,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _filtersDefault.default), {
@@ -23581,20 +23628,20 @@ function Home() {
                             onTypeChange: setSelectedType
                         }, void 0, false, {
                             fileName: "Components/home.jsx",
-                            lineNumber: 111,
+                            lineNumber: 170,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "Components/home.jsx",
-                    lineNumber: 93,
+                    lineNumber: 135,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _sorterDefault.default), {
                     onSortChange: setSortOption
                 }, void 0, false, {
                     fileName: "Components/home.jsx",
-                    lineNumber: 118,
+                    lineNumber: 177,
                     columnNumber: 9
                 }, this),
                 loading ? /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
@@ -23603,29 +23650,29 @@ function Home() {
                         length: 10
                     }).map((_, index)=>/*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _shimmerDefault.default), {}, index, false, {
                             fileName: "Components/home.jsx",
-                            lineNumber: 123,
+                            lineNumber: 182,
                             columnNumber: 15
                         }, this))
                 }, void 0, false, {
                     fileName: "Components/home.jsx",
-                    lineNumber: 121,
+                    lineNumber: 180,
                     columnNumber: 11
                 }, this) : filteredPokemons.length > 0 ? /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _framerMotion.motion).div, {
                     layout: true,
                     className: "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6",
-                    children: filteredPokemons.map((pokemon)=>/*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _pokeCardDefault.default), {
+                    children: filteredPokemons.map((pokemon)=>/*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _pokecardDefault.default), {
                             id: pokemon.id,
                             name: pokemon.name,
                             image: pokemon.image,
                             type: pokemon.type
                         }, pokemon.id, false, {
                             fileName: "Components/home.jsx",
-                            lineNumber: 132,
+                            lineNumber: 191,
                             columnNumber: 15
                         }, this))
                 }, void 0, false, {
                     fileName: "Components/home.jsx",
-                    lineNumber: 127,
+                    lineNumber: 186,
                     columnNumber: 11
                 }, this) : /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
                     className: "text-center py-12",
@@ -23635,7 +23682,7 @@ function Home() {
                             children: "No Pok\xe9mon found matching your criteria"
                         }, void 0, false, {
                             fileName: "Components/home.jsx",
-                            lineNumber: 143,
+                            lineNumber: 202,
                             columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("button", {
@@ -23643,29 +23690,30 @@ function Home() {
                                 setSearchTerm("");
                                 setSelectedType("");
                                 setSortOption("");
+                                setFilteredPokemons(pokemons);
                             },
                             className: "px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition",
                             children: "Reset Filters"
                         }, void 0, false, {
                             fileName: "Components/home.jsx",
-                            lineNumber: 144,
+                            lineNumber: 205,
                             columnNumber: 13
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "Components/home.jsx",
-                    lineNumber: 142,
+                    lineNumber: 201,
                     columnNumber: 11
                 }, this)
             ]
         }, void 0, true, {
             fileName: "Components/home.jsx",
-            lineNumber: 80,
+            lineNumber: 122,
             columnNumber: 7
         }, this)
     }, void 0, false, {
         fileName: "Components/home.jsx",
-        lineNumber: 79,
+        lineNumber: 121,
         columnNumber: 5
     }, this);
 }
@@ -23679,11 +23727,15 @@ $RefreshReg$(_c, "Home");
   globalThis.$RefreshReg$ = prevRefreshReg;
   globalThis.$RefreshSig$ = prevRefreshSig;
 }
-},{"react/jsx-dev-runtime":"dVPUn","react":"jMk1U","./fetchpokemon":"4XaZI","../components/PokeCard":"9WRb2","../Components/filters":"amUXY","../Components/sorter":"hgzPl","../Components/shimmer":"fdA6v","framer-motion":"6Fwkt","@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT","@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js":"7h6Pi"}],"4XaZI":[function(require,module,exports,__globalThis) {
+},{"react/jsx-dev-runtime":"dVPUn","react":"jMk1U","../Components/fetchpokemon":"4XaZI","../Components/pokecard":"jPVhW","../Components/filters":"amUXY","../Components/sorter":"hgzPl","../Components/shimmer":"fdA6v","framer-motion":"6Fwkt","@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT","@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js":"7h6Pi"}],"4XaZI":[function(require,module,exports,__globalThis) {
+// src/components/fetchpokemon.js
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "fetchPokemons", ()=>fetchPokemons);
+let pokemonCache = null;
 async function fetchPokemons(limit = 1000) {
+    // ✅ Return from cache if already fetched
+    if (pokemonCache) return pokemonCache;
     const res = await fetch(`https://pokeapi.co/api/v2/pokemon?limit=${limit}`);
     const data = await res.json();
     const detailedData = await Promise.all(data.results.map(async (pokemon)=>{
@@ -23699,17 +23751,19 @@ async function fetchPokemons(limit = 1000) {
             abilities: pokeData.abilities.map((a)=>a.ability.name)
         };
     }));
+    pokemonCache = detailedData; // ✅ Store in cache
     return detailedData;
 }
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT"}],"9WRb2":[function(require,module,exports,__globalThis) {
-var $parcel$ReactRefreshHelpers$3638 = require("@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js");
-$parcel$ReactRefreshHelpers$3638.init();
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT"}],"jPVhW":[function(require,module,exports,__globalThis) {
+var $parcel$ReactRefreshHelpers$9532 = require("@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js");
+$parcel$ReactRefreshHelpers$9532.init();
 var prevRefreshReg = globalThis.$RefreshReg$;
 var prevRefreshSig = globalThis.$RefreshSig$;
-$parcel$ReactRefreshHelpers$3638.prelude(module);
+$parcel$ReactRefreshHelpers$9532.prelude(module);
 
 try {
+// src/components/PokeCard.jsx
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "default", ()=>PokeCard);
@@ -23719,7 +23773,6 @@ var _reactRouterDom = require("react-router-dom");
 var _lucideReact = require("lucide-react");
 var _framerMotion = require("framer-motion");
 var _s = $RefreshSig$();
-// Colors for types (extend as needed)
 const typeColors = {
     normal: "bg-gray-400",
     fire: "bg-red-500",
@@ -23742,7 +23795,6 @@ const typeColors = {
 };
 function PokeCard({ id, name, image, type, shinyMode }) {
     _s();
-    const [imgSrc, setImgSrc] = (0, _react.useState)(image);
     const [isPlaying, setIsPlaying] = (0, _react.useState)(false);
     const [loadingAudio, setLoadingAudio] = (0, _react.useState)(false);
     const navigate = (0, _reactRouterDom.useNavigate)();
@@ -23760,8 +23812,7 @@ function PokeCard({ id, name, image, type, shinyMode }) {
             setLoadingAudio(false);
         }
     };
-    const primaryType = type.split(", ")[0].toLowerCase();
-    // Animated sprite or shiny based on shinyMode
+    const primaryType = type?.split(", ")[0]?.toLowerCase() || "normal";
     const animatedGifUrl = shinyMode ? `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/shiny/${id}.gif` : `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/${id}.gif`;
     return /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _framerMotion.motion).div, {
         initial: {
@@ -23793,7 +23844,7 @@ function PokeCard({ id, name, image, type, shinyMode }) {
                                 id.toString().padStart(3, "0")
                             ]
                         }, void 0, true, {
-                            fileName: "components/PokeCard.jsx",
+                            fileName: "Components/pokecard.jsx",
                             lineNumber: 73,
                             columnNumber: 11
                         }, this),
@@ -23803,18 +23854,18 @@ function PokeCard({ id, name, image, type, shinyMode }) {
                                     className: `px-2 py-1 text-xs rounded-full ${typeColors[t.toLowerCase()] || "bg-gray-400"} text-white`,
                                     children: t
                                 }, t, false, {
-                                    fileName: "components/PokeCard.jsx",
-                                    lineNumber: 76,
+                                    fileName: "Components/pokecard.jsx",
+                                    lineNumber: 78,
                                     columnNumber: 15
                                 }, this))
                         }, void 0, false, {
-                            fileName: "components/PokeCard.jsx",
-                            lineNumber: 74,
+                            fileName: "Components/pokecard.jsx",
+                            lineNumber: 76,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
-                    fileName: "components/PokeCard.jsx",
+                    fileName: "Components/pokecard.jsx",
                     lineNumber: 72,
                     columnNumber: 9
                 }, this),
@@ -23823,28 +23874,30 @@ function PokeCard({ id, name, image, type, shinyMode }) {
                     children: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _framerMotion.motion).img, {
                         src: animatedGifUrl,
                         alt: name,
-                        onError: ()=>setImgSrc("https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/" + id + ".png"),
+                        onError: (e)=>{
+                            e.currentTarget.src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${id}.png`;
+                        },
                         className: "w-32 h-32 object-contain hover:scale-110 transition-transform",
                         whileHover: {
                             scale: 1.1
                         },
                         loading: "lazy"
                     }, void 0, false, {
-                        fileName: "components/PokeCard.jsx",
-                        lineNumber: 89,
+                        fileName: "Components/pokecard.jsx",
+                        lineNumber: 91,
                         columnNumber: 11
                     }, this)
                 }, void 0, false, {
-                    fileName: "components/PokeCard.jsx",
-                    lineNumber: 88,
+                    fileName: "Components/pokecard.jsx",
+                    lineNumber: 90,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("h2", {
                     className: "text-xl font-bold capitalize text-center mb-2 text-gray-800",
                     children: name
                 }, void 0, false, {
-                    fileName: "components/PokeCard.jsx",
-                    lineNumber: 101,
+                    fileName: "Components/pokecard.jsx",
+                    lineNumber: 103,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
@@ -23863,8 +23916,8 @@ function PokeCard({ id, name, image, type, shinyMode }) {
                                 /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("span", {
                                     children: "Details"
                                 }, void 0, false, {
-                                    fileName: "components/PokeCard.jsx",
-                                    lineNumber: 114,
+                                    fileName: "Components/pokecard.jsx",
+                                    lineNumber: 116,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("svg", {
@@ -23879,19 +23932,19 @@ function PokeCard({ id, name, image, type, shinyMode }) {
                                         strokeWidth: 2,
                                         d: "M9 5l7 7-7 7"
                                     }, void 0, false, {
-                                        fileName: "components/PokeCard.jsx",
-                                        lineNumber: 122,
+                                        fileName: "Components/pokecard.jsx",
+                                        lineNumber: 124,
                                         columnNumber: 15
                                     }, this)
                                 }, void 0, false, {
-                                    fileName: "components/PokeCard.jsx",
-                                    lineNumber: 115,
+                                    fileName: "Components/pokecard.jsx",
+                                    lineNumber: 117,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
-                            fileName: "components/PokeCard.jsx",
-                            lineNumber: 106,
+                            fileName: "Components/pokecard.jsx",
+                            lineNumber: 108,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _framerMotion.motion).button, {
@@ -23907,40 +23960,40 @@ function PokeCard({ id, name, image, type, shinyMode }) {
                             children: loadingAudio ? /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _lucideReact.Loader), {
                                 className: "animate-spin h-5 w-5 text-blue-500"
                             }, void 0, false, {
-                                fileName: "components/PokeCard.jsx",
-                                lineNumber: 136,
+                                fileName: "Components/pokecard.jsx",
+                                lineNumber: 140,
                                 columnNumber: 15
                             }, this) : /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _lucideReact.PlayCircle), {
                                 className: "h-5 w-5 text-blue-500"
                             }, void 0, false, {
-                                fileName: "components/PokeCard.jsx",
-                                lineNumber: 138,
+                                fileName: "Components/pokecard.jsx",
+                                lineNumber: 142,
                                 columnNumber: 15
                             }, this)
                         }, void 0, false, {
-                            fileName: "components/PokeCard.jsx",
-                            lineNumber: 126,
+                            fileName: "Components/pokecard.jsx",
+                            lineNumber: 128,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
-                    fileName: "components/PokeCard.jsx",
-                    lineNumber: 105,
+                    fileName: "Components/pokecard.jsx",
+                    lineNumber: 107,
                     columnNumber: 9
                 }, this)
             ]
         }, void 0, true, {
-            fileName: "components/PokeCard.jsx",
+            fileName: "Components/pokecard.jsx",
             lineNumber: 71,
             columnNumber: 7
         }, this)
     }, void 0, false, {
-        fileName: "components/PokeCard.jsx",
-        lineNumber: 59,
+        fileName: "Components/pokecard.jsx",
+        lineNumber: 57,
         columnNumber: 5
     }, this);
 }
-_s(PokeCard, "rqgtozcG12Cyf9ZsCab1SUiTU1w=", false, function() {
+_s(PokeCard, "t4LAXZXgHLsfPICGzsJkuDJOWHM=", false, function() {
     return [
         (0, _reactRouterDom.useNavigate)
     ];
@@ -23949,7 +24002,7 @@ _c = PokeCard;
 var _c;
 $RefreshReg$(_c, "PokeCard");
 
-  $parcel$ReactRefreshHelpers$3638.postlude(module);
+  $parcel$ReactRefreshHelpers$9532.postlude(module);
 } finally {
   globalThis.$RefreshReg$ = prevRefreshReg;
   globalThis.$RefreshSig$ = prevRefreshSig;
@@ -46094,7 +46147,6 @@ var prevRefreshSig = globalThis.$RefreshSig$;
 $parcel$ReactRefreshHelpers$bbf8.prelude(module);
 
 try {
-// src/components/Sorter.jsx
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "default", ()=>Sorter);
@@ -46147,7 +46199,7 @@ function Sorter({ onSortChange }) {
                 children: "Sort By"
             }, void 0, false, {
                 fileName: "Components/sorter.jsx",
-                lineNumber: 19,
+                lineNumber: 18,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
@@ -46164,18 +46216,18 @@ function Sorter({ onSortChange }) {
                         children: option.label
                     }, option.value, false, {
                         fileName: "Components/sorter.jsx",
-                        lineNumber: 24,
+                        lineNumber: 21,
                         columnNumber: 11
                     }, this))
             }, void 0, false, {
                 fileName: "Components/sorter.jsx",
-                lineNumber: 22,
+                lineNumber: 19,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "Components/sorter.jsx",
-        lineNumber: 18,
+        lineNumber: 17,
         columnNumber: 5
     }, this);
 }
@@ -46196,95 +46248,126 @@ var prevRefreshSig = globalThis.$RefreshSig$;
 $parcel$ReactRefreshHelpers$c830.prelude(module);
 
 try {
-// src/components/ShimmerCard.jsx
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "default", ()=>ShimmerCard);
 var _jsxDevRuntime = require("react/jsx-dev-runtime");
 function ShimmerCard() {
     return /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
-        className: "bg-white p-5 rounded-xl shadow animate-pulse overflow-hidden",
+        className: "bg-white p-5 rounded-xl shadow overflow-hidden relative",
         children: [
             /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
-                className: "h-40 bg-gray-200 rounded-lg mb-4"
+                className: "absolute inset-0 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 opacity-60 animate-shimmer"
             }, void 0, false, {
                 fileName: "Components/shimmer.jsx",
-                lineNumber: 5,
+                lineNumber: 4,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
-                className: "space-y-3",
+                className: "relative",
                 children: [
                     /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
-                        className: "h-4 bg-gray-200 rounded w-3/4"
+                        className: "h-40 bg-gray-200 rounded-lg mb-4"
                     }, void 0, false, {
                         fileName: "Components/shimmer.jsx",
-                        lineNumber: 7,
+                        lineNumber: 6,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
-                        className: "h-3 bg-gray-200 rounded w-1/2"
-                    }, void 0, false, {
-                        fileName: "Components/shimmer.jsx",
-                        lineNumber: 8,
-                        columnNumber: 9
-                    }, this),
-                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
-                        className: "flex gap-2 mt-4",
+                        className: "space-y-3",
                         children: [
                             /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
-                                className: "h-6 bg-gray-200 rounded-full w-16"
+                                className: "h-4 bg-gray-200 rounded w-3/4"
                             }, void 0, false, {
+                                fileName: "Components/shimmer.jsx",
+                                lineNumber: 8,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
+                                className: "h-3 bg-gray-200 rounded w-1/2"
+                            }, void 0, false, {
+                                fileName: "Components/shimmer.jsx",
+                                lineNumber: 9,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
+                                className: "flex gap-2 mt-4",
+                                children: [
+                                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
+                                        className: "h-6 bg-gray-200 rounded-full w-16"
+                                    }, void 0, false, {
+                                        fileName: "Components/shimmer.jsx",
+                                        lineNumber: 11,
+                                        columnNumber: 13
+                                    }, this),
+                                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
+                                        className: "h-6 bg-gray-200 rounded-full w-16"
+                                    }, void 0, false, {
+                                        fileName: "Components/shimmer.jsx",
+                                        lineNumber: 12,
+                                        columnNumber: 13
+                                    }, this)
+                                ]
+                            }, void 0, true, {
                                 fileName: "Components/shimmer.jsx",
                                 lineNumber: 10,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
-                                className: "h-6 bg-gray-200 rounded-full w-16"
-                            }, void 0, false, {
-                                fileName: "Components/shimmer.jsx",
-                                lineNumber: 11,
-                                columnNumber: 11
-                            }, this)
-                        ]
-                    }, void 0, true, {
-                        fileName: "Components/shimmer.jsx",
-                        lineNumber: 9,
-                        columnNumber: 9
-                    }, this),
-                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
-                        className: "flex justify-between mt-6",
-                        children: [
-                            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
-                                className: "h-8 bg-gray-200 rounded-lg w-20"
-                            }, void 0, false, {
+                                className: "flex justify-between mt-6",
+                                children: [
+                                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
+                                        className: "h-8 bg-gray-200 rounded-lg w-20"
+                                    }, void 0, false, {
+                                        fileName: "Components/shimmer.jsx",
+                                        lineNumber: 15,
+                                        columnNumber: 13
+                                    }, this),
+                                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
+                                        className: "h-8 bg-gray-200 rounded-full w-8"
+                                    }, void 0, false, {
+                                        fileName: "Components/shimmer.jsx",
+                                        lineNumber: 16,
+                                        columnNumber: 13
+                                    }, this)
+                                ]
+                            }, void 0, true, {
                                 fileName: "Components/shimmer.jsx",
                                 lineNumber: 14,
                                 columnNumber: 11
-                            }, this),
-                            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
-                                className: "h-8 bg-gray-200 rounded-full w-8"
-                            }, void 0, false, {
-                                fileName: "Components/shimmer.jsx",
-                                lineNumber: 15,
-                                columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "Components/shimmer.jsx",
-                        lineNumber: 13,
+                        lineNumber: 7,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "Components/shimmer.jsx",
-                lineNumber: 6,
+                lineNumber: 5,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("style", {
+                children: `
+        @keyframes shimmer {
+          0% { background-position: -500px 0; }
+          100% { background-position: 500px 0; }
+        }
+        .animate-shimmer {
+          background-size: 1000px 100%;
+          animation: shimmer 2s linear infinite;
+        }
+      `
+            }, void 0, false, {
+                fileName: "Components/shimmer.jsx",
+                lineNumber: 20,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "Components/shimmer.jsx",
-        lineNumber: 4,
+        lineNumber: 3,
         columnNumber: 5
     }, this);
 }
@@ -46350,6 +46433,8 @@ function formatVersionSprites(obj) {
     }
     return images;
 }
+const detailsCache = {};
+const speciesCache = {};
 function PokemonDetails() {
     _s();
     const { id } = (0, _reactRouterDom.useParams)();
@@ -46363,7 +46448,9 @@ function PokemonDetails() {
     const [gallery, setGallery] = (0, _react.useState)([]);
     const [playingVideo, setPlayingVideo] = (0, _react.useState)(null);
     const [selectedImage, setSelectedImage] = (0, _react.useState)(null);
-    const [movesDetails, setMovesDetails] = (0, _react.useState)({}); // moveName => details
+    const [movesDetails, setMovesDetails] = (0, _react.useState)({});
+    const [videoSearch, setVideoSearch] = (0, _react.useState)("");
+    const [videoLoading, setVideoLoading] = (0, _react.useState)(false);
     (0, _react.useEffect)(()=>{
         async function fetchData() {
             try {
@@ -46374,17 +46461,29 @@ function PokemonDetails() {
                 setVideos([]);
                 setGallery([]);
                 setSelectedImage(null);
-                // Fetch main pokemon data
-                const pokemonRes = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`);
-                if (!pokemonRes.ok) throw new Error("Pok\xe9mon not found");
-                const data = await pokemonRes.json();
+                setVideoSearch("");
+                setVideoLoading(false);
+                setPlayingVideo(null);
+                // Use cache if present
+                let data;
+                if (detailsCache[id]) data = detailsCache[id];
+                else {
+                    const pokemonRes = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`);
+                    if (!pokemonRes.ok) throw new Error("Pok\xe9mon not found");
+                    data = await pokemonRes.json();
+                    detailsCache[id] = data;
+                }
                 setPokemon(data);
-                // Fetch species data (for About tab)
-                const speciesRes = await fetch(`https://pokeapi.co/api/v2/pokemon-species/${id}`);
-                if (!speciesRes.ok) throw new Error("Pok\xe9mon species not found");
-                const speciesData = await speciesRes.json();
+                // Species cache
+                let speciesData;
+                if (speciesCache[id]) speciesData = speciesCache[id];
+                else {
+                    const speciesRes = await fetch(`https://pokeapi.co/api/v2/pokemon-species/${id}`);
+                    if (!speciesRes.ok) throw new Error("Pok\xe9mon species not found");
+                    speciesData = await speciesRes.json();
+                    speciesCache[id] = speciesData;
+                }
                 setSpecies(speciesData);
-                // Build full gallery (sprites + other images + animated gifs)
                 let spriteGallery = [];
                 // Basic sprites
                 for(const key in data.sprites)if (data.sprites[key] && typeof data.sprites[key] === "string") spriteGallery.push({
@@ -46443,9 +46542,9 @@ function PokemonDetails() {
                         ...prevGallery,
                         ...cardImages
                     ]);
-                // Fetch YouTube videos related to Pokémon
+                // Fetch YouTube videos related to Pokémon on first load
                 await fetchYouTubeVideos(data.name);
-                // Fetch detailed move info in background (optional, for enhanced moves tab)
+                // Fetch detailed move info in background (optional)
                 const moveDetailsPromises = data.moves.map(async (moveEntry)=>{
                     const moveName = moveEntry.move.name;
                     try {
@@ -46479,6 +46578,7 @@ function PokemonDetails() {
         id
     ]);
     async function fetchYouTubeVideos(pokemonName) {
+        setVideoLoading(true);
         if (!YOUTUBE_API_KEY) {
             setVideos([
                 {
@@ -46488,10 +46588,47 @@ function PokemonDetails() {
                     url: `https://www.youtube.com/embed/dQw4w9WgXcQ`
                 }
             ]);
+            setVideoLoading(false);
             return;
         }
-        const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&maxResults=3&q=${encodeURIComponent(pokemonName + " battle anime")}&key=${YOUTUBE_API_KEY}`;
+        const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&maxResults=6&q=${encodeURIComponent(pokemonName + " battle anime")}&key=${YOUTUBE_API_KEY}`;
         try {
+            const resp = await fetch(url);
+            const data = await resp.json();
+            if (data && data.items) {
+                // Shuffle for varied results
+                const shuffled = data.items.sort(()=>Math.random() - 0.5);
+                setVideos(shuffled.map((item)=>({
+                        id: item.id.videoId,
+                        title: item.snippet.title,
+                        thumbnail: item.snippet.thumbnails.medium.url,
+                        url: `https://www.youtube.com/embed/${item.id.videoId}`
+                    })));
+            }
+        } catch  {
+            setVideos([]);
+        }
+        setVideoLoading(false);
+    }
+    async function handleVideoSearch(event) {
+        event.preventDefault();
+        if (!videoSearch.trim()) return;
+        setVideoLoading(true);
+        const searchQuery = videoSearch.trim() + " pokemon battle anime";
+        if (!YOUTUBE_API_KEY) {
+            setVideos([
+                {
+                    id: "1",
+                    title: `${searchQuery} (default)`,
+                    thumbnail: `https://img.youtube.com/vi/dQw4w9WgXcQ/mqdefault.jpg`,
+                    url: `https://www.youtube.com/embed/dQw4w9WgXcQ`
+                }
+            ]);
+            setVideoLoading(false);
+            return;
+        }
+        try {
+            const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&maxResults=5&q=${encodeURIComponent(searchQuery)}&key=${YOUTUBE_API_KEY}`;
             const resp = await fetch(url);
             const data = await resp.json();
             if (data && data.items) setVideos(data.items.map((item)=>({
@@ -46500,9 +46637,11 @@ function PokemonDetails() {
                     thumbnail: item.snippet.thumbnails.medium.url,
                     url: `https://www.youtube.com/embed/${item.id.videoId}`
                 })));
+            else setVideos([]);
         } catch  {
             setVideos([]);
         }
+        setVideoLoading(false);
     }
     const playSound = ()=>{
         const audio = new Audio(`https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/${id}.ogg`);
@@ -46514,12 +46653,12 @@ function PokemonDetails() {
             className: "animate-spin rounded-full h-12 w-12 border-t-4 border-blue-600"
         }, void 0, false, {
             fileName: "Components/pokemondetails.jsx",
-            lineNumber: 234,
+            lineNumber: 299,
             columnNumber: 9
         }, this)
     }, void 0, false, {
         fileName: "Components/pokemondetails.jsx",
-        lineNumber: 233,
+        lineNumber: 298,
         columnNumber: 7
     }, this);
     if (error) return /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
@@ -46530,7 +46669,7 @@ function PokemonDetails() {
                 children: error
             }, void 0, false, {
                 fileName: "Components/pokemondetails.jsx",
-                lineNumber: 241,
+                lineNumber: 306,
                 columnNumber: 9
             }, this),
             /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("button", {
@@ -46539,13 +46678,13 @@ function PokemonDetails() {
                 children: "Go Back"
             }, void 0, false, {
                 fileName: "Components/pokemondetails.jsx",
-                lineNumber: 242,
+                lineNumber: 307,
                 columnNumber: 9
             }, this)
         ]
     }, void 0, true, {
         fileName: "Components/pokemondetails.jsx",
-        lineNumber: 240,
+        lineNumber: 305,
         columnNumber: 7
     }, this);
     const primaryType = pokemon?.types[0]?.type?.name || "normal";
@@ -46579,19 +46718,19 @@ function PokemonDetails() {
                             d: "M15 19l-7-7 7-7"
                         }, void 0, false, {
                             fileName: "Components/pokemondetails.jsx",
-                            lineNumber: 258,
+                            lineNumber: 335,
                             columnNumber: 11
                         }, this)
                     }, void 0, false, {
                         fileName: "Components/pokemondetails.jsx",
-                        lineNumber: 257,
+                        lineNumber: 327,
                         columnNumber: 9
                     }, this),
                     "Back to Pok\xe9dex"
                 ]
             }, void 0, true, {
                 fileName: "Components/pokemondetails.jsx",
-                lineNumber: 256,
+                lineNumber: 321,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
@@ -46613,7 +46752,7 @@ function PokemonDetails() {
                             loading: "lazy"
                         }, void 0, false, {
                             fileName: "Components/pokemondetails.jsx",
-                            lineNumber: 266,
+                            lineNumber: 343,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
@@ -46624,7 +46763,7 @@ function PokemonDetails() {
                                     children: pokemon.name
                                 }, void 0, false, {
                                     fileName: "Components/pokemondetails.jsx",
-                                    lineNumber: 276,
+                                    lineNumber: 353,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("p", {
@@ -46635,7 +46774,7 @@ function PokemonDetails() {
                                     ]
                                 }, void 0, true, {
                                     fileName: "Components/pokemondetails.jsx",
-                                    lineNumber: 277,
+                                    lineNumber: 354,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
@@ -46645,12 +46784,12 @@ function PokemonDetails() {
                                             children: type.name
                                         }, type.name, false, {
                                             fileName: "Components/pokemondetails.jsx",
-                                            lineNumber: 281,
+                                            lineNumber: 360,
                                             columnNumber: 17
                                         }, this))
                                 }, void 0, false, {
                                     fileName: "Components/pokemondetails.jsx",
-                                    lineNumber: 279,
+                                    lineNumber: 358,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
@@ -46662,8 +46801,8 @@ function PokemonDetails() {
                                                     children: "Height"
                                                 }, void 0, false, {
                                                     fileName: "Components/pokemondetails.jsx",
-                                                    lineNumber: 286,
-                                                    columnNumber: 20
+                                                    lineNumber: 368,
+                                                    columnNumber: 17
                                                 }, this),
                                                 /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("p", {
                                                     children: [
@@ -46672,13 +46811,13 @@ function PokemonDetails() {
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "Components/pokemondetails.jsx",
-                                                    lineNumber: 286,
-                                                    columnNumber: 33
+                                                    lineNumber: 369,
+                                                    columnNumber: 17
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "Components/pokemondetails.jsx",
-                                            lineNumber: 286,
+                                            lineNumber: 367,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
@@ -46687,8 +46826,8 @@ function PokemonDetails() {
                                                     children: "Weight"
                                                 }, void 0, false, {
                                                     fileName: "Components/pokemondetails.jsx",
-                                                    lineNumber: 287,
-                                                    columnNumber: 20
+                                                    lineNumber: 372,
+                                                    columnNumber: 17
                                                 }, this),
                                                 /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("p", {
                                                     children: [
@@ -46697,19 +46836,19 @@ function PokemonDetails() {
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "Components/pokemondetails.jsx",
-                                                    lineNumber: 287,
-                                                    columnNumber: 33
+                                                    lineNumber: 373,
+                                                    columnNumber: 17
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "Components/pokemondetails.jsx",
-                                            lineNumber: 287,
+                                            lineNumber: 371,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "Components/pokemondetails.jsx",
-                                    lineNumber: 285,
+                                    lineNumber: 366,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("button", {
@@ -46727,7 +46866,7 @@ function PokemonDetails() {
                                                     d: "M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217z"
                                                 }, void 0, false, {
                                                     fileName: "Components/pokemondetails.jsx",
-                                                    lineNumber: 292,
+                                                    lineNumber: 388,
                                                     columnNumber: 17
                                                 }, this),
                                                 /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("path", {
@@ -46736,37 +46875,37 @@ function PokemonDetails() {
                                                     clipRule: "evenodd"
                                                 }, void 0, false, {
                                                     fileName: "Components/pokemondetails.jsx",
-                                                    lineNumber: 293,
+                                                    lineNumber: 389,
                                                     columnNumber: 17
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "Components/pokemondetails.jsx",
-                                            lineNumber: 291,
+                                            lineNumber: 382,
                                             columnNumber: 15
                                         }, this),
                                         "Play Cry"
                                     ]
                                 }, void 0, true, {
                                     fileName: "Components/pokemondetails.jsx",
-                                    lineNumber: 290,
+                                    lineNumber: 377,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "Components/pokemondetails.jsx",
-                            lineNumber: 275,
+                            lineNumber: 352,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "Components/pokemondetails.jsx",
-                    lineNumber: 265,
+                    lineNumber: 342,
                     columnNumber: 9
                 }, this)
             }, void 0, false, {
                 fileName: "Components/pokemondetails.jsx",
-                lineNumber: 264,
+                lineNumber: 341,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _react1.Tab).Group, {
@@ -46784,12 +46923,12 @@ function PokemonDetails() {
                                 children: tab
                             }, tab, false, {
                                 fileName: "Components/pokemondetails.jsx",
-                                lineNumber: 304,
+                                lineNumber: 404,
                                 columnNumber: 13
                             }, this))
                     }, void 0, false, {
                         fileName: "Components/pokemondetails.jsx",
-                        lineNumber: 302,
+                        lineNumber: 402,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _react1.Tab).Panels, {
@@ -46804,7 +46943,7 @@ function PokemonDetails() {
                                             children: "About"
                                         }, void 0, false, {
                                             fileName: "Components/pokemondetails.jsx",
-                                            lineNumber: 315,
+                                            lineNumber: 422,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("p", {
@@ -46812,7 +46951,7 @@ function PokemonDetails() {
                                             children: species.flavor_text_entries.find((e)=>e.language.name === "en")?.flavor_text.replace(/\f/g, " ") || "No description."
                                         }, void 0, false, {
                                             fileName: "Components/pokemondetails.jsx",
-                                            lineNumber: 316,
+                                            lineNumber: 423,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("p", {
@@ -46821,14 +46960,14 @@ function PokemonDetails() {
                                                     children: "Genus: "
                                                 }, void 0, false, {
                                                     fileName: "Components/pokemondetails.jsx",
-                                                    lineNumber: 317,
+                                                    lineNumber: 427,
                                                     columnNumber: 20
                                                 }, this),
                                                 species.genera.find((g)=>g.language.name === "en")?.genus || "Unknown"
                                             ]
                                         }, void 0, true, {
                                             fileName: "Components/pokemondetails.jsx",
-                                            lineNumber: 317,
+                                            lineNumber: 427,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("p", {
@@ -46837,14 +46976,14 @@ function PokemonDetails() {
                                                     children: "Color: "
                                                 }, void 0, false, {
                                                     fileName: "Components/pokemondetails.jsx",
-                                                    lineNumber: 318,
+                                                    lineNumber: 428,
                                                     columnNumber: 20
                                                 }, this),
                                                 species.color.name
                                             ]
                                         }, void 0, true, {
                                             fileName: "Components/pokemondetails.jsx",
-                                            lineNumber: 318,
+                                            lineNumber: 428,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("p", {
@@ -46853,14 +46992,14 @@ function PokemonDetails() {
                                                     children: "Habitat: "
                                                 }, void 0, false, {
                                                     fileName: "Components/pokemondetails.jsx",
-                                                    lineNumber: 319,
+                                                    lineNumber: 429,
                                                     columnNumber: 20
                                                 }, this),
                                                 species.habitat?.name || "Unknown"
                                             ]
                                         }, void 0, true, {
                                             fileName: "Components/pokemondetails.jsx",
-                                            lineNumber: 319,
+                                            lineNumber: 429,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("p", {
@@ -46869,14 +47008,14 @@ function PokemonDetails() {
                                                     children: "Shape: "
                                                 }, void 0, false, {
                                                     fileName: "Components/pokemondetails.jsx",
-                                                    lineNumber: 320,
+                                                    lineNumber: 430,
                                                     columnNumber: 20
                                                 }, this),
                                                 species.shape?.name || "Unknown"
                                             ]
                                         }, void 0, true, {
                                             fileName: "Components/pokemondetails.jsx",
-                                            lineNumber: 320,
+                                            lineNumber: 430,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("p", {
@@ -46885,14 +47024,14 @@ function PokemonDetails() {
                                                     children: "Capture Rate: "
                                                 }, void 0, false, {
                                                     fileName: "Components/pokemondetails.jsx",
-                                                    lineNumber: 321,
+                                                    lineNumber: 431,
                                                     columnNumber: 20
                                                 }, this),
                                                 species.capture_rate
                                             ]
                                         }, void 0, true, {
                                             fileName: "Components/pokemondetails.jsx",
-                                            lineNumber: 321,
+                                            lineNumber: 431,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("p", {
@@ -46901,14 +47040,14 @@ function PokemonDetails() {
                                                     children: "Base Happiness: "
                                                 }, void 0, false, {
                                                     fileName: "Components/pokemondetails.jsx",
-                                                    lineNumber: 322,
+                                                    lineNumber: 432,
                                                     columnNumber: 20
                                                 }, this),
                                                 species.base_happiness
                                             ]
                                         }, void 0, true, {
                                             fileName: "Components/pokemondetails.jsx",
-                                            lineNumber: 322,
+                                            lineNumber: 432,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("p", {
@@ -46917,14 +47056,14 @@ function PokemonDetails() {
                                                     children: "Growth Rate: "
                                                 }, void 0, false, {
                                                     fileName: "Components/pokemondetails.jsx",
-                                                    lineNumber: 323,
+                                                    lineNumber: 433,
                                                     columnNumber: 20
                                                 }, this),
                                                 species.growth_rate?.name || "Unknown"
                                             ]
                                         }, void 0, true, {
                                             fileName: "Components/pokemondetails.jsx",
-                                            lineNumber: 323,
+                                            lineNumber: 433,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("p", {
@@ -46933,14 +47072,14 @@ function PokemonDetails() {
                                                     children: "Generation: "
                                                 }, void 0, false, {
                                                     fileName: "Components/pokemondetails.jsx",
-                                                    lineNumber: 324,
+                                                    lineNumber: 434,
                                                     columnNumber: 20
                                                 }, this),
                                                 species.generation?.name || "Unknown"
                                             ]
                                         }, void 0, true, {
                                             fileName: "Components/pokemondetails.jsx",
-                                            lineNumber: 324,
+                                            lineNumber: 434,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("p", {
@@ -46949,14 +47088,14 @@ function PokemonDetails() {
                                                     children: "Egg Groups: "
                                                 }, void 0, false, {
                                                     fileName: "Components/pokemondetails.jsx",
-                                                    lineNumber: 325,
+                                                    lineNumber: 435,
                                                     columnNumber: 20
                                                 }, this),
                                                 species.egg_groups.map((g)=>g.name).join(", ")
                                             ]
                                         }, void 0, true, {
                                             fileName: "Components/pokemondetails.jsx",
-                                            lineNumber: 325,
+                                            lineNumber: 435,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("p", {
@@ -46965,14 +47104,14 @@ function PokemonDetails() {
                                                     children: "Legendary: "
                                                 }, void 0, false, {
                                                     fileName: "Components/pokemondetails.jsx",
-                                                    lineNumber: 326,
+                                                    lineNumber: 436,
                                                     columnNumber: 20
                                                 }, this),
                                                 species.is_legendary ? "Yes" : "No"
                                             ]
                                         }, void 0, true, {
                                             fileName: "Components/pokemondetails.jsx",
-                                            lineNumber: 326,
+                                            lineNumber: 436,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("p", {
@@ -46981,14 +47120,14 @@ function PokemonDetails() {
                                                     children: "Mythical: "
                                                 }, void 0, false, {
                                                     fileName: "Components/pokemondetails.jsx",
-                                                    lineNumber: 327,
+                                                    lineNumber: 437,
                                                     columnNumber: 20
                                                 }, this),
                                                 species.is_mythical ? "Yes" : "No"
                                             ]
                                         }, void 0, true, {
                                             fileName: "Components/pokemondetails.jsx",
-                                            lineNumber: 327,
+                                            lineNumber: 437,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("p", {
@@ -46997,14 +47136,14 @@ function PokemonDetails() {
                                                     children: "Ultra Beast: "
                                                 }, void 0, false, {
                                                     fileName: "Components/pokemondetails.jsx",
-                                                    lineNumber: 328,
+                                                    lineNumber: 438,
                                                     columnNumber: 20
                                                 }, this),
                                                 species.is_ultra_beast ? "Yes" : "No"
                                             ]
                                         }, void 0, true, {
                                             fileName: "Components/pokemondetails.jsx",
-                                            lineNumber: 328,
+                                            lineNumber: 438,
                                             columnNumber: 17
                                         }, this)
                                     ]
@@ -47012,12 +47151,12 @@ function PokemonDetails() {
                                     children: "Loading about info..."
                                 }, void 0, false, {
                                     fileName: "Components/pokemondetails.jsx",
-                                    lineNumber: 331,
+                                    lineNumber: 441,
                                     columnNumber: 15
                                 }, this)
                             }, void 0, false, {
                                 fileName: "Components/pokemondetails.jsx",
-                                lineNumber: 312,
+                                lineNumber: 419,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _react1.Tab).Panel, {
@@ -47028,7 +47167,7 @@ function PokemonDetails() {
                                         children: "Base Stats"
                                     }, void 0, false, {
                                         fileName: "Components/pokemondetails.jsx",
-                                        lineNumber: 337,
+                                        lineNumber: 447,
                                         columnNumber: 13
                                     }, this),
                                     pokemon.stats.map((stat)=>/*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
@@ -47039,7 +47178,7 @@ function PokemonDetails() {
                                                     children: stat.stat.name.replace("-", " ")
                                                 }, void 0, false, {
                                                     fileName: "Components/pokemondetails.jsx",
-                                                    lineNumber: 340,
+                                                    lineNumber: 450,
                                                     columnNumber: 17
                                                 }, this),
                                                 /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("progress", {
@@ -47050,7 +47189,7 @@ function PokemonDetails() {
                                                     children: stat.base_stat
                                                 }, void 0, false, {
                                                     fileName: "Components/pokemondetails.jsx",
-                                                    lineNumber: 341,
+                                                    lineNumber: 451,
                                                     columnNumber: 17
                                                 }, this),
                                                 /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("span", {
@@ -47058,19 +47197,19 @@ function PokemonDetails() {
                                                     children: stat.base_stat
                                                 }, void 0, false, {
                                                     fileName: "Components/pokemondetails.jsx",
-                                                    lineNumber: 342,
+                                                    lineNumber: 454,
                                                     columnNumber: 17
                                                 }, this)
                                             ]
                                         }, stat.stat.name, true, {
                                             fileName: "Components/pokemondetails.jsx",
-                                            lineNumber: 339,
+                                            lineNumber: 449,
                                             columnNumber: 15
                                         }, this))
                                 ]
                             }, void 0, true, {
                                 fileName: "Components/pokemondetails.jsx",
-                                lineNumber: 336,
+                                lineNumber: 446,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _react1.Tab).Panel, {
@@ -47079,12 +47218,12 @@ function PokemonDetails() {
                                     pokemonId: id
                                 }, void 0, false, {
                                     fileName: "Components/pokemondetails.jsx",
-                                    lineNumber: 349,
+                                    lineNumber: 461,
                                     columnNumber: 13
                                 }, this)
                             }, void 0, false, {
                                 fileName: "Components/pokemondetails.jsx",
-                                lineNumber: 348,
+                                lineNumber: 460,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _react1.Tab).Panel, {
@@ -47095,7 +47234,7 @@ function PokemonDetails() {
                                         children: "Moves"
                                     }, void 0, false, {
                                         fileName: "Components/pokemondetails.jsx",
-                                        lineNumber: 354,
+                                        lineNumber: 466,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
@@ -47105,24 +47244,24 @@ function PokemonDetails() {
                                                 children: m.move.name.replace(/-/g, " ")
                                             }, m.move.name, false, {
                                                 fileName: "Components/pokemondetails.jsx",
-                                                lineNumber: 358,
+                                                lineNumber: 470,
                                                 columnNumber: 19
                                             }, this)) : /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("p", {
                                             children: "No moves available."
                                         }, void 0, false, {
                                             fileName: "Components/pokemondetails.jsx",
-                                            lineNumber: 363,
+                                            lineNumber: 475,
                                             columnNumber: 17
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "Components/pokemondetails.jsx",
-                                        lineNumber: 355,
+                                        lineNumber: 467,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "Components/pokemondetails.jsx",
-                                lineNumber: 353,
+                                lineNumber: 465,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _react1.Tab).Panel, {
@@ -47135,7 +47274,7 @@ function PokemonDetails() {
                                                 children: "Gallery (All Artwork, Sprites, GIFs, Cards)"
                                             }, void 0, false, {
                                                 fileName: "Components/pokemondetails.jsx",
-                                                lineNumber: 371,
+                                                lineNumber: 483,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
@@ -47144,7 +47283,7 @@ function PokemonDetails() {
                                                         whileHover: {
                                                             scale: 1.05
                                                         },
-                                                        className: "rounded-lg overflow-hidden border border-gray-300 cursor-pointer",
+                                                        className: "relative rounded-lg overflow-hidden border border-gray-300 cursor-pointer",
                                                         onClick: ()=>setSelectedImage(media),
                                                         title: media.title,
                                                         children: [
@@ -47159,7 +47298,7 @@ function PokemonDetails() {
                                                                 }
                                                             }, void 0, false, {
                                                                 fileName: "Components/pokemondetails.jsx",
-                                                                lineNumber: 376,
+                                                                lineNumber: 494,
                                                                 columnNumber: 23
                                                             }, this),
                                                             /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("p", {
@@ -47167,30 +47306,80 @@ function PokemonDetails() {
                                                                 children: media.title
                                                             }, void 0, false, {
                                                                 fileName: "Components/pokemondetails.jsx",
-                                                                lineNumber: 377,
+                                                                lineNumber: 504,
+                                                                columnNumber: 23
+                                                            }, this),
+                                                            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("button", {
+                                                                onClick: (e)=>{
+                                                                    e.stopPropagation();
+                                                                    const link = document.createElement("a");
+                                                                    link.href = media.url;
+                                                                    link.download = media.title.replace(/\s+/g, "_") + ".png";
+                                                                    document.body.appendChild(link);
+                                                                    link.click();
+                                                                    document.body.removeChild(link);
+                                                                },
+                                                                className: "absolute top-1 right-1 bg-white bg-opacity-80 rounded-full p-1 shadow hover:bg-opacity-100 transition",
+                                                                "aria-label": `Download ${media.title}`,
+                                                                title: `Download ${media.title}`,
+                                                                children: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("svg", {
+                                                                    xmlns: "http://www.w3.org/2000/svg",
+                                                                    className: "h-5 w-5 text-gray-700",
+                                                                    fill: "none",
+                                                                    viewBox: "0 0 24 24",
+                                                                    stroke: "currentColor",
+                                                                    strokeWidth: 2,
+                                                                    children: [
+                                                                        /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("path", {
+                                                                            strokeLinecap: "round",
+                                                                            strokeLinejoin: "round",
+                                                                            d: "M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2"
+                                                                        }, void 0, false, {
+                                                                            fileName: "Components/pokemondetails.jsx",
+                                                                            lineNumber: 529,
+                                                                            columnNumber: 27
+                                                                        }, this),
+                                                                        /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("path", {
+                                                                            strokeLinecap: "round",
+                                                                            strokeLinejoin: "round",
+                                                                            d: "M12 12v8m0 0l-4-4m4 4l4-4"
+                                                                        }, void 0, false, {
+                                                                            fileName: "Components/pokemondetails.jsx",
+                                                                            lineNumber: 530,
+                                                                            columnNumber: 27
+                                                                        }, this)
+                                                                    ]
+                                                                }, void 0, true, {
+                                                                    fileName: "Components/pokemondetails.jsx",
+                                                                    lineNumber: 521,
+                                                                    columnNumber: 25
+                                                                }, this)
+                                                            }, void 0, false, {
+                                                                fileName: "Components/pokemondetails.jsx",
+                                                                lineNumber: 507,
                                                                 columnNumber: 23
                                                             }, this)
                                                         ]
                                                     }, media.id, true, {
                                                         fileName: "Components/pokemondetails.jsx",
-                                                        lineNumber: 375,
+                                                        lineNumber: 487,
                                                         columnNumber: 21
                                                     }, this)) : /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("p", {
                                                     children: "No media available."
                                                 }, void 0, false, {
                                                     fileName: "Components/pokemondetails.jsx",
-                                                    lineNumber: 381,
+                                                    lineNumber: 536,
                                                     columnNumber: 19
                                                 }, this)
                                             }, void 0, false, {
                                                 fileName: "Components/pokemondetails.jsx",
-                                                lineNumber: 372,
+                                                lineNumber: 484,
                                                 columnNumber: 15
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "Components/pokemondetails.jsx",
-                                        lineNumber: 370,
+                                        lineNumber: 482,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("section", {
@@ -47200,7 +47389,39 @@ function PokemonDetails() {
                                                 children: "Videos"
                                             }, void 0, false, {
                                                 fileName: "Components/pokemondetails.jsx",
-                                                lineNumber: 388,
+                                                lineNumber: 543,
+                                                columnNumber: 15
+                                            }, this),
+                                            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("form", {
+                                                onSubmit: handleVideoSearch,
+                                                className: "mb-4 flex gap-2 max-w-md",
+                                                children: [
+                                                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("input", {
+                                                        type: "text",
+                                                        placeholder: `Search videos related to ${pokemon?.name}`,
+                                                        value: videoSearch,
+                                                        onChange: (e)=>setVideoSearch(e.target.value),
+                                                        className: "flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
+                                                        "aria-label": "Search YouTube videos"
+                                                    }, void 0, false, {
+                                                        fileName: "Components/pokemondetails.jsx",
+                                                        lineNumber: 546,
+                                                        columnNumber: 17
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("button", {
+                                                        type: "submit",
+                                                        disabled: videoLoading,
+                                                        className: "px-4 py-2 rounded-lg bg-blue-600 text-white font-semibold shadow hover:bg-blue-700 transition disabled:bg-blue-300",
+                                                        children: videoLoading ? "Searching..." : "Search"
+                                                    }, void 0, false, {
+                                                        fileName: "Components/pokemondetails.jsx",
+                                                        lineNumber: 554,
+                                                        columnNumber: 17
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "Components/pokemondetails.jsx",
+                                                lineNumber: 545,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
@@ -47212,6 +47433,7 @@ function PokemonDetails() {
                                                             boxShadow: "0 8px 20px rgba(59,130,246,0.4)"
                                                         },
                                                         onClick: ()=>setPlayingVideo(video.id),
+                                                        title: video.title,
                                                         children: [
                                                             playingVideo === video.id ? /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("iframe", {
                                                                 src: `${video.url}?autoplay=1`,
@@ -47221,64 +47443,65 @@ function PokemonDetails() {
                                                                 allowFullScreen: true
                                                             }, void 0, false, {
                                                                 fileName: "Components/pokemondetails.jsx",
-                                                                lineNumber: 393,
-                                                                columnNumber: 23
+                                                                lineNumber: 574,
+                                                                columnNumber: 25
                                                             }, this) : /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("img", {
                                                                 src: video.thumbnail,
                                                                 alt: video.title,
-                                                                className: "w-full h-56 object-cover rounded-lg"
+                                                                className: "w-full h-56 object-cover rounded-lg",
+                                                                loading: "lazy"
                                                             }, void 0, false, {
                                                                 fileName: "Components/pokemondetails.jsx",
-                                                                lineNumber: 395,
-                                                                columnNumber: 23
+                                                                lineNumber: 582,
+                                                                columnNumber: 25
                                                             }, this),
                                                             /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("p", {
                                                                 className: "p-3 font-semibold text-gray-800 truncate",
                                                                 children: video.title
                                                             }, void 0, false, {
                                                                 fileName: "Components/pokemondetails.jsx",
-                                                                lineNumber: 397,
-                                                                columnNumber: 21
+                                                                lineNumber: 589,
+                                                                columnNumber: 23
                                                             }, this)
                                                         ]
                                                     }, video.id, true, {
                                                         fileName: "Components/pokemondetails.jsx",
-                                                        lineNumber: 391,
-                                                        columnNumber: 19
+                                                        lineNumber: 566,
+                                                        columnNumber: 21
                                                     }, this)) : /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("p", {
                                                     children: "No videos found."
                                                 }, void 0, false, {
                                                     fileName: "Components/pokemondetails.jsx",
-                                                    lineNumber: 399,
-                                                    columnNumber: 22
+                                                    lineNumber: 593,
+                                                    columnNumber: 19
                                                 }, this)
                                             }, void 0, false, {
                                                 fileName: "Components/pokemondetails.jsx",
-                                                lineNumber: 389,
+                                                lineNumber: 563,
                                                 columnNumber: 15
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "Components/pokemondetails.jsx",
-                                        lineNumber: 387,
+                                        lineNumber: 542,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "Components/pokemondetails.jsx",
-                                lineNumber: 369,
+                                lineNumber: 481,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "Components/pokemondetails.jsx",
-                        lineNumber: 310,
+                        lineNumber: 417,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "Components/pokemondetails.jsx",
-                lineNumber: 301,
+                lineNumber: 401,
                 columnNumber: 7
             }, this),
             selectedImage && /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _framerMotion.motion).div, {
@@ -47325,17 +47548,17 @@ function PokemonDetails() {
                                     d: "M6 18L18 6M6 6l12 12"
                                 }, void 0, false, {
                                     fileName: "Components/pokemondetails.jsx",
-                                    lineNumber: 412,
+                                    lineNumber: 632,
                                     columnNumber: 17
                                 }, this)
                             }, void 0, false, {
                                 fileName: "Components/pokemondetails.jsx",
-                                lineNumber: 411,
+                                lineNumber: 624,
                                 columnNumber: 15
                             }, this)
                         }, void 0, false, {
                             fileName: "Components/pokemondetails.jsx",
-                            lineNumber: 410,
+                            lineNumber: 619,
                             columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("img", {
@@ -47345,7 +47568,7 @@ function PokemonDetails() {
                             loading: "lazy"
                         }, void 0, false, {
                             fileName: "Components/pokemondetails.jsx",
-                            lineNumber: 415,
+                            lineNumber: 635,
                             columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("p", {
@@ -47353,28 +47576,28 @@ function PokemonDetails() {
                             children: selectedImage.title
                         }, void 0, false, {
                             fileName: "Components/pokemondetails.jsx",
-                            lineNumber: 416,
+                            lineNumber: 641,
                             columnNumber: 13
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "Components/pokemondetails.jsx",
-                    lineNumber: 409,
+                    lineNumber: 612,
                     columnNumber: 11
                 }, this)
             }, void 0, false, {
                 fileName: "Components/pokemondetails.jsx",
-                lineNumber: 408,
+                lineNumber: 603,
                 columnNumber: 9
             }, this)
         ]
     }, void 0, true, {
         fileName: "Components/pokemondetails.jsx",
-        lineNumber: 254,
+        lineNumber: 319,
         columnNumber: 5
     }, this);
 }
-_s(PokemonDetails, "QhBF8rYU2W8uZ2h9AjwXVdD6xb8=", false, function() {
+_s(PokemonDetails, "y23he81KgZ0LFzzEZEDQMZFn4+k=", false, function() {
     return [
         (0, _reactRouterDom.useParams),
         (0, _reactRouterDom.useNavigate)
@@ -50167,7 +50390,6 @@ var prevRefreshSig = globalThis.$RefreshSig$;
 $parcel$ReactRefreshHelpers$27cb.prelude(module);
 
 try {
-// src/components/EvolutionChain.jsx
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "default", ()=>EvolutionChain);
@@ -50176,6 +50398,7 @@ var _react = require("react");
 var _reactRouterDom = require("react-router-dom");
 var _framerMotion = require("framer-motion");
 var _s = $RefreshSig$();
+const evoCache = {};
 function EvolutionChain({ pokemonId }) {
     _s();
     const [evolutionChain, setEvolutionChain] = (0, _react.useState)([]);
@@ -50185,6 +50408,12 @@ function EvolutionChain({ pokemonId }) {
         const fetchEvolutionChain = async ()=>{
             try {
                 setLoading(true);
+                // ✅ Use cache if available
+                if (evoCache[pokemonId]) {
+                    setEvolutionChain(evoCache[pokemonId]);
+                    setLoading(false);
+                    return;
+                }
                 // First get the species data
                 const speciesRes = await fetch(`https://pokeapi.co/api/v2/pokemon-species/${pokemonId}/`);
                 const speciesData = await speciesRes.json();
@@ -50206,6 +50435,7 @@ function EvolutionChain({ pokemonId }) {
                     });
                     current = current.evolves_to[0];
                 }
+                evoCache[pokemonId] = chain; // ✅ Save to cache
                 setEvolutionChain(chain);
             } catch (error) {
                 console.error("Error fetching evolution chain:", error);
@@ -50223,12 +50453,12 @@ function EvolutionChain({ pokemonId }) {
             className: "animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"
         }, void 0, false, {
             fileName: "Components/evolution.jsx",
-            lineNumber: 56,
+            lineNumber: 66,
             columnNumber: 7
         }, this)
     }, void 0, false, {
         fileName: "Components/evolution.jsx",
-        lineNumber: 55,
+        lineNumber: 65,
         columnNumber: 5
     }, this);
     if (evolutionChain.length === 0) return /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
@@ -50236,7 +50466,7 @@ function EvolutionChain({ pokemonId }) {
         children: "No evolution data available"
     }, void 0, false, {
         fileName: "Components/evolution.jsx",
-        lineNumber: 61,
+        lineNumber: 71,
         columnNumber: 5
     }, this);
     return /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
@@ -50247,7 +50477,7 @@ function EvolutionChain({ pokemonId }) {
                 children: "Evolution Chain"
             }, void 0, false, {
                 fileName: "Components/evolution.jsx",
-                lineNumber: 68,
+                lineNumber: 78,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
@@ -50268,7 +50498,7 @@ function EvolutionChain({ pokemonId }) {
                                         className: "w-24 h-24 object-contain group-hover:opacity-80 transition"
                                     }, void 0, false, {
                                         fileName: "Components/evolution.jsx",
-                                        lineNumber: 78,
+                                        lineNumber: 88,
                                         columnNumber: 15
                                     }, this),
                                     index > 0 && /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
@@ -50286,23 +50516,23 @@ function EvolutionChain({ pokemonId }) {
                                                 d: "M13 5l7 7-7 7M5 5l7 7-7 7"
                                             }, void 0, false, {
                                                 fileName: "Components/evolution.jsx",
-                                                lineNumber: 86,
+                                                lineNumber: 96,
                                                 columnNumber: 21
                                             }, this)
                                         }, void 0, false, {
                                             fileName: "Components/evolution.jsx",
-                                            lineNumber: 85,
+                                            lineNumber: 95,
                                             columnNumber: 19
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "Components/evolution.jsx",
-                                        lineNumber: 84,
+                                        lineNumber: 94,
                                         columnNumber: 17
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "Components/evolution.jsx",
-                                lineNumber: 77,
+                                lineNumber: 87,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("span", {
@@ -50310,7 +50540,7 @@ function EvolutionChain({ pokemonId }) {
                                 children: pokemon.name
                             }, void 0, false, {
                                 fileName: "Components/evolution.jsx",
-                                lineNumber: 91,
+                                lineNumber: 101,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
@@ -50320,29 +50550,29 @@ function EvolutionChain({ pokemonId }) {
                                         children: type
                                     }, type, false, {
                                         fileName: "Components/evolution.jsx",
-                                        lineNumber: 94,
+                                        lineNumber: 104,
                                         columnNumber: 17
                                     }, this))
                             }, void 0, false, {
                                 fileName: "Components/evolution.jsx",
-                                lineNumber: 92,
+                                lineNumber: 102,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, pokemon.id, true, {
                         fileName: "Components/evolution.jsx",
-                        lineNumber: 71,
+                        lineNumber: 81,
                         columnNumber: 11
                     }, this))
             }, void 0, false, {
                 fileName: "Components/evolution.jsx",
-                lineNumber: 69,
+                lineNumber: 79,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "Components/evolution.jsx",
-        lineNumber: 67,
+        lineNumber: 77,
         columnNumber: 5
     }, this);
 }

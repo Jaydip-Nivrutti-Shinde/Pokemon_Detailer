@@ -1,4 +1,13 @@
+// src/components/fetchpokemon.js
+
+let pokemonCache = null;
+
 export async function fetchPokemons(limit = 1000) {
+  // ✅ Return from cache if already fetched
+  if (pokemonCache) {
+    return pokemonCache;
+  }
+
   const res = await fetch(`https://pokeapi.co/api/v2/pokemon?limit=${limit}`);
   const data = await res.json();
 
@@ -21,5 +30,6 @@ export async function fetchPokemons(limit = 1000) {
     })
   );
 
+  pokemonCache = detailedData; // ✅ Store in cache
   return detailedData;
-} 
+}

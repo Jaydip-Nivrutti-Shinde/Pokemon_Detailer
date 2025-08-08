@@ -1,9 +1,9 @@
+// src/components/PokeCard.jsx
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { PlayCircle, Loader } from "lucide-react";
 import { motion } from "framer-motion";
 
-// Colors for types (extend as needed)
 const typeColors = {
   normal: "bg-gray-400",
   fire: "bg-red-500",
@@ -26,7 +26,6 @@ const typeColors = {
 };
 
 export default function PokeCard({ id, name, image, type, shinyMode }) {
-  const [imgSrc, setImgSrc] = useState(image);
   const [isPlaying, setIsPlaying] = useState(false);
   const [loadingAudio, setLoadingAudio] = useState(false);
   const navigate = useNavigate();
@@ -48,9 +47,8 @@ export default function PokeCard({ id, name, image, type, shinyMode }) {
     }
   };
 
-  const primaryType = type.split(", ")[0].toLowerCase();
+  const primaryType = type?.split(", ")[0]?.toLowerCase() || "normal";
 
-  // Animated sprite or shiny based on shinyMode
   const animatedGifUrl = shinyMode
     ? `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/shiny/${id}.gif`
     : `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/${id}.gif`;
@@ -65,12 +63,16 @@ export default function PokeCard({ id, name, image, type, shinyMode }) {
         boxShadow: "0 8px 15px rgba(59,130,246,0.5)",
         rotateY: 10,
       }}
-      className={`rounded-xl overflow-hidden shadow-lg ${typeColors[primaryType] || "bg-gray-200"} bg-opacity-25 backdrop-blur-sm border border-gray-100 cursor-pointer`}
+      className={`rounded-xl overflow-hidden shadow-lg ${
+        typeColors[primaryType] || "bg-gray-200"
+      } bg-opacity-25 backdrop-blur-sm border border-gray-100 cursor-pointer`}
       onClick={() => navigate(`/pokemon/${id}`)}
     >
       <div className="p-4">
         <div className="flex justify-between items-start">
-          <span className="text-gray-600 font-semibold">#{id.toString().padStart(3, "0")}</span>
+          <span className="text-gray-600 font-semibold">
+            #{id.toString().padStart(3, "0")}
+          </span>
           <div className="flex space-x-1">
             {type.split(", ").map((t) => (
               <span
@@ -89,9 +91,9 @@ export default function PokeCard({ id, name, image, type, shinyMode }) {
           <motion.img
             src={animatedGifUrl}
             alt={name}
-            onError={() =>
-              setImgSrc("https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/" + id + ".png")
-            }
+            onError={(e) => {
+              e.currentTarget.src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${id}.png`;
+            }}
             className="w-32 h-32 object-contain hover:scale-110 transition-transform"
             whileHover={{ scale: 1.1 }}
             loading="lazy"
@@ -129,7 +131,9 @@ export default function PokeCard({ id, name, image, type, shinyMode }) {
               e.stopPropagation();
               playSound();
             }}
-            className={`p-2 rounded-full ${isPlaying ? "bg-blue-100" : "bg-white"} shadow hover:bg-gray-100 transition`}
+            className={`p-2 rounded-full ${
+              isPlaying ? "bg-blue-100" : "bg-white"
+            } shadow hover:bg-gray-100 transition`}
             disabled={loadingAudio}
           >
             {loadingAudio ? (
