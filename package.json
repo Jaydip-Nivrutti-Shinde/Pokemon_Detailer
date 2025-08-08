@@ -1,0 +1,32 @@
+{
+  "name": "swiggy_total_react",
+  "version": "1.0.0",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "parcel index.html",
+    "build": "parcel build index.html"
+  },
+  "author": "",
+  "license": "ISC",
+  "keywords": [],
+  "description": "",
+  "dependencies": {
+    "@headlessui/react": "^2.2.7",
+    "@heroicons/react": "^2.2.0",
+    "@tailwindcss/postcss": "^4.1.11",
+    "framer-motion": "^12.23.12",
+    "html2canvas": "^1.4.1",
+    "lucide-react": "^0.536.0",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
+    "react-router-dom": "^6.30.1",
+    "react-speech-recognition": "^4.0.1",
+    "react-tsparticles": "^2.12.2",
+    "router": "^2.2.0",
+    "tailwind-scrollbar-hide": "^4.0.0",
+    "tailwindcss": "^4.1.11"
+  },
+  "devDependencies": {
+    "parcel": "^2.15.4"
+  }
+}
