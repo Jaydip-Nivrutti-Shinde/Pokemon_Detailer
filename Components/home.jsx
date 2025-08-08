@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { fetchPokemons } from "./fetchpokemon";
-import PokeCard from "../components/PokeCard";
+import PokeCard from "../Components/PokeCard";
 import Filters from "../Components/filters";
 import Sorter from "../Components/sorter";
 import ShimmerCard from "../Components/shimmer";
