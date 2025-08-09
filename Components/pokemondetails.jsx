@@ -4,8 +4,8 @@ import { Tab } from "@headlessui/react";
 import { motion } from "framer-motion";
 import EvolutionChain from "../Components/evolution";
 
-const YOUTUBE_API_KEY = "AIzaSyCBG75IyW9yWiPuJHdwsHg1G0FbcoBt8hY";
-const POKEMON_TCG_API_KEY = "40040fa4-f6a4-46f7-8e32-1a14a7709cab";
+const YOUTUBE_API_KEY = process.env.REACT_APP_YT;
+const POKEMON_TCG_API_KEY = process.env.REACT_APP_Poke;
 
 const typeColors = {
   normal: "bg-gradient-to-br from-gray-400 to-gray-600 text-white",
